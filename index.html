@@ -50,18 +50,24 @@
 
             <div id="calculator-goal">
                 <p class="text-gray-400 text-center mb-6">Estimate the time to reach your target</p>
-                <div>
-                    <label for="target" class="block text-sm font-medium text-gray-400 mb-2">Target Amount ($)</label>
-                    <div class="relative">
-                        <input type="number" id="target" placeholder="e.g., 50" onkeydown="handleEnter(event, 'time')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 pl-4 pr-12 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
-                        <div class="absolute inset-y-0 right-0 pr-1 flex flex-col items-center justify-center">
-                            <button onclick="changeValue(1)" class="h-1/2 px-2 flex items-center justify-center text-gray-500 hover:text-cyan-400 transition-colors focus:outline-none">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
-                            </button>
-                             <button onclick="changeValue(-1)" class="h-1/2 px-2 flex items-center justify-center text-gray-500 hover:text-cyan-400 transition-colors focus:outline-none">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                            </button>
+                <div class="space-y-6">
+                    <div>
+                        <label for="target" class="block text-sm font-medium text-gray-400 mb-2">Target Amount ($)</label>
+                        <div class="relative">
+                            <input type="number" id="target" placeholder="e.g., 50" onkeydown="handleEnter(event, 'time')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 pl-4 pr-12 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
+                            <div class="absolute inset-y-0 right-0 pr-1 flex flex-col items-center justify-center">
+                                <button onclick="changeValue(1)" class="h-1/2 px-2 flex items-center justify-center text-gray-500 hover:text-cyan-400 transition-colors focus:outline-none">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
+                                </button>
+                                 <button onclick="changeValue(-1)" class="h-1/2 px-2 flex items-center justify-center text-gray-500 hover:text-cyan-400 transition-colors focus:outline-none">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                                </button>
+                            </div>
                         </div>
+                    </div>
+                    <div>
+                        <label for="goal-multiplier" class="block text-sm font-medium text-gray-400 mb-2">Account Multiplier</label>
+                        <input type="number" id="goal-multiplier" placeholder="1" onkeydown="handleEnter(event, 'time')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
                     </div>
                 </div>
                 <button onclick="calculateTime()" class="w-full mt-8 bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-3 px-4 rounded-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-cyan-500">
@@ -72,6 +78,10 @@
 
             <div id="calculator-time" class="hidden">
                 <p class="text-gray-400 text-center mb-6">Enter a duration to estimate potential earnings</p>
+                 <div class="mb-6">
+                    <label for="time-multiplier" class="block text-sm font-medium text-gray-400 mb-2">Account Multiplier</label>
+                    <input type="number" id="time-multiplier" placeholder="1" onkeydown="handleEnter(event, 'earnings')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
+                </div>
                 <div class="grid grid-cols-3 gap-4">
                     <div>
                         <label for="days" class="block text-sm font-medium text-gray-400 mb-2">Days</label>
@@ -182,7 +192,6 @@
         function formatRelativeTime(futureDate) {
             const now = new Date();
             const seconds = Math.round((futureDate - now) / 1000);
-
             const minutes = Math.round(seconds / 60);
             const hours = Math.round(seconds / 3600);
             const days = Math.round(seconds / 86400);
@@ -200,6 +209,7 @@
         
         function calculateTime() {
             const target = parseFloat(document.getElementById("target").value);
+            const multiplier = parseFloat(document.getElementById("goal-multiplier").value) || 1;
             const outputDiv = document.getElementById("time-output");
             const lowReward = 0.10;
             const highReward = 0.15;
@@ -214,9 +224,10 @@
                 lastCalculatedValue = null;
                 return;
             }
-
-            const bestCase = timeToReach(target, highReward);
-            const worstCase = timeToReach(target, lowReward);
+            
+            const targetPerAccount = target / multiplier;
+            const bestCase = timeToReach(targetPerAccount, highReward);
+            const worstCase = timeToReach(targetPerAccount, lowReward);
             const now = new Date();
             const bestCaseDate = new Date(now.getTime() + (bestCase.days * 86400000) + (bestCase.hours * 3600000) + (bestCase.minutes * 60000));
             const worstCaseDate = new Date(now.getTime() + (worstCase.days * 86400000) + (worstCase.hours * 3600000) + (worstCase.minutes * 60000));
@@ -233,20 +244,20 @@
                     <div class="text-center">
                         <h3 class="font-medium text-lg text-gray-300 mb-2">Est. Time to Reach $${target.toFixed(2)}</h3>
                         <p class="text-2xl font-semibold mt-2 text-white">${formatTime(bestCase)} - ${formatTime(worstCase)}</p>
-                        <p class="text-sm text-gray-400 mt-3">Plays Needed: <span class="font-semibold text-white">${bestCase.playsNeeded.toLocaleString()} - ${worstCase.playsNeeded.toLocaleString()}</span></p>
-                        <p class="text-xs text-gray-500 mt-4 italic">Based on a reward of $0.10 - $0.15 every 30 mins.</p>
+                        <p class="text-sm text-gray-400 mt-3">Plays Needed (per acc): <span class="font-semibold text-white">${bestCase.playsNeeded.toLocaleString()} - ${worstCase.playsNeeded.toLocaleString()}</span></p>
+                        <p class="text-xs text-gray-500 mt-4 italic">Based on $0.10 - $0.15 every 30 mins, across ${multiplier} account(s).</p>
                     </div>
                     <div class="border-t border-gray-700/50 pt-4">
                          <h4 class="font-medium text-md text-gray-300 mb-3 text-center">Discord Timestamps</h4>
                          <div class="space-y-3">
-                            <div class="bg-gray-800/50 p-2 rounded-lg flex justify-between items-center">
-                                <span class="text-white text-sm pl-2">${bestCaseRelative}</span>
-                                <button onclick="copyTimestamp('${bestCaseDiscord}', this)" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1.5 px-4 rounded-md transition-colors">Copy Best</button>
-                            </div>
-                            <div class="bg-gray-800/50 p-2 rounded-lg flex justify-between items-center">
-                                <span class="text-white text-sm pl-2">${worstCaseRelative}</span>
-                                <button onclick="copyTimestamp('${worstCaseDiscord}', this)" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1.5 px-4 rounded-md transition-colors">Copy Worst</button>
-                            </div>
+                             <div class="bg-gray-800/50 p-2 rounded-lg flex justify-between items-center">
+                                 <span class="text-white text-sm pl-2">${bestCaseRelative}</span>
+                                 <button onclick="copyTimestamp('${bestCaseDiscord}', this)" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1.5 px-4 rounded-md transition-colors">Copy Best</button>
+                             </div>
+                             <div class="bg-gray-800/50 p-2 rounded-lg flex justify-between items-center">
+                                 <span class="text-white text-sm pl-2">${worstCaseRelative}</span>
+                                 <button onclick="copyTimestamp('${worstCaseDiscord}', this)" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1.5 px-4 rounded-md transition-colors">Copy Worst</button>
+                             </div>
                          </div>
                     </div>
                 </div>`;
@@ -258,6 +269,7 @@
             const days = parseFloat(document.getElementById('days').value) || 0;
             const hours = parseFloat(document.getElementById('hours').value) || 0;
             const minutes = parseFloat(document.getElementById('minutes').value) || 0;
+            const multiplier = parseFloat(document.getElementById("time-multiplier").value) || 1;
             const outputDiv = document.getElementById('earnings-output');
             outputDiv.innerHTML = '';
             outputDiv.classList.remove('opacity-100');
@@ -271,14 +283,14 @@
 
             const totalMinutes = (days * 24 * 60) + (hours * 60) + minutes;
             const plays = Math.floor(totalMinutes / 30);
-            const lowEarnings = plays * 0.10;
-            const highEarnings = plays * 0.15;
+            const lowEarnings = plays * 0.10 * multiplier;
+            const highEarnings = plays * 0.15 * multiplier;
             
             let resultHTML = `
                 <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-lg space-y-3 text-center">
-                    <h3 class="font-medium text-lg text-gray-300">Est. Earnings</h3>
+                    <h3 class="font-medium text-lg text-gray-300">Est. Total Earnings</h3>
                     <p class="text-2xl font-semibold text-white">$${lowEarnings.toFixed(2)} - $${highEarnings.toFixed(2)}</p>
-                    <p class="text-sm text-gray-400">From <span class="font-semibold text-white">${plays.toLocaleString()}</span> plays</p>
+                    <p class="text-sm text-gray-400">From <span class="font-semibold text-white">${(plays * multiplier).toLocaleString()}</span> total plays across <span class="font-semibold text-white">${multiplier}</span> account(s)</p>
                 </div>`;
             outputDiv.innerHTML = resultHTML;
             setTimeout(() => { outputDiv.classList.add('opacity-100'); }, 100);
