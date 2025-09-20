@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnings Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1c2023;
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        .glow-shadow {
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.1), 0 0 50px rgba(56, 189, 248, 0.08);
+        }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: none;
+        }
+    </style>
+</head>
+<body class="text-gray-200">
+
+    <div class="flex justify-center items-center min-h-screen p-4">
+        <div class="w-full max-w-md bg-[#232728]/80 backdrop-blur-lg rounded-2xl border border-cyan-400/20 glow-shadow p-8">
+            
+            <div class="text-center mb-6">
+                <div class="flex justify-center items-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-400">
+                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <h1 class="text-4xl font-bold tracking-tighter text-white">Earnings Calculator</h1>
+            </div>
+
+            <div class="flex border-b border-gray-700 mb-6">
+                <button id="tab-goal" onclick="showTab('goal')" class="flex-1 py-2 text-center font-semibold border-b-2 border-cyan-400 text-white transition-colors duration-300">Earnings Goal</button>
+                <button id="tab-time" onclick="showTab('time')" class="flex-1 py-2 text-center font-semibold border-b-2 border-transparent text-gray-500 hover:text-white transition-colors duration-300">Time To Earnings</button>
+            </div>
+
+            <div id="calculator-goal">
+                <p class="text-gray-400 text-center mb-6">Estimate the time to reach your target</p>
+                <div>
+                    <label for="target" class="block text-sm font-medium text-gray-400 mb-2">Target Amount ($)</label>
+                    <div class="relative">
+                        <input type="number" id="target" placeholder="e.g., 50" onkeydown="handleEnter(event, 'time')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 pl-4 pr-12 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
+                        <div class="absolute inset-y-0 right-0 pr-1 flex flex-col items-center justify-center">
+                            <button onclick="changeValue(1)" class="h-1/2 px-2 flex items-center justify-center text-gray-500 hover:text-cyan-400 transition-colors focus:outline-none">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
+                            </button>
+                             <button onclick="changeValue(-1)" class="h-1/2 px-2 flex items-center justify-center text-gray-500 hover:text-cyan-400 transition-colors focus:outline-none">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="calculateTime()" class="w-full mt-8 bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-3 px-4 rounded-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-cyan-500">
+                    Calculate Time
+                </button>
+                <div id="time-output" class="mt-8 text-center transition-opacity duration-500 opacity-0"></div>
+            </div>
+
+            <div id="calculator-time" class="hidden">
+                <p class="text-gray-400 text-center mb-6">Enter a duration to estimate potential earnings</p>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label for="days" class="block text-sm font-medium text-gray-400 mb-2">Days</label>
+                        <input type="number" id="days" placeholder="0" onkeydown="handleEnter(event, 'earnings')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
+                    </div>
+                    <div>
+                        <label for="hours" class="block text-sm font-medium text-gray-400 mb-2">Hours</label>
+                        <input type="number" id="hours" placeholder="0" onkeydown="handleEnter(event, 'earnings')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
+                    </div>
+                    <div>
+                        <label for="minutes" class="block text-sm font-medium text-gray-400 mb-2">Minutes</label>
+                        <input type="number" id="minutes" placeholder="0" onkeydown="handleEnter(event, 'earnings')" class="w-full bg-gray-900/50 border border-gray-700 rounded-md py-3 px-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 focus:outline-none transition-all text-lg">
+                    </div>
+                </div>
+                <button onclick="calculateEarnings()" class="w-full mt-8 bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-3 px-4 rounded-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-cyan-500">
+                    Calculate Earnings
+                </button>
+                <div id="earnings-output" class="mt-8 text-center transition-opacity duration-500 opacity-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastCalculatedValue = null;
+
+        function showTab(tabName) {
+            const goalTab = document.getElementById('tab-goal');
+            const timeTab = document.getElementById('tab-time');
+            const goalCalculator = document.getElementById('calculator-goal');
+            const timeCalculator = document.getElementById('calculator-time');
+            if (tabName === 'goal') {
+                goalCalculator.classList.remove('hidden');
+                timeCalculator.classList.add('hidden');
+                goalTab.classList.add('border-cyan-400', 'text-white');
+                goalTab.classList.remove('border-transparent', 'text-gray-500');
+                timeTab.classList.add('border-transparent', 'text-gray-500');
+                timeTab.classList.remove('border-cyan-400', 'text-white');
+            } else if (tabName === 'time') {
+                timeCalculator.classList.remove('hidden');
+                goalCalculator.classList.add('hidden');
+                timeTab.classList.add('border-cyan-400', 'text-white');
+                timeTab.classList.remove('border-transparent', 'text-gray-500');
+                goalTab.classList.add('border-transparent', 'text-gray-500');
+                goalTab.classList.remove('border-cyan-400', 'text-white');
+            }
+        }
+
+        function handleEnter(event, calculatorType) {
+            if (event.key === 'Enter') {
+                if (calculatorType === 'time') {
+                    const targetInput = document.getElementById("target");
+                    const currentValue = parseFloat(targetInput.value);
+                    if (currentValue !== lastCalculatedValue) {
+                        calculateTime();
+                    }
+                } else if (calculatorType === 'earnings') {
+                    calculateEarnings();
+                }
+            }
+        }
+
+        function changeValue(amount) {
+            const targetInput = document.getElementById("target");
+            let currentValue = parseFloat(targetInput.value) || 0;
+            let newValue = currentValue + amount;
+            if (newValue < 0) {
+                newValue = 0;
+            }
+            targetInput.value = newValue;
+        }
+
+        function copyTimestamp(text, buttonElement) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'absolute';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copied!';
+                buttonElement.disabled = true;
+                setTimeout(() => {
+                    buttonElement.textContent = originalText;
+                    buttonElement.disabled = false;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function timeToReach(target, rewardPerPlay, intervalMinutes = 30) {
+            if (rewardPerPlay <= 0) return null;
+            let playsNeeded = Math.ceil(target / rewardPerPlay);
+            let totalMinutes = playsNeeded * intervalMinutes;
+            let days = Math.floor(totalMinutes / (24 * 60));
+            let hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+            let minutes = totalMinutes % 60;
+            return { playsNeeded, days, hours, minutes };
+        }
+
+        function formatTime(timeObj) {
+            return `${timeObj.days}d, ${timeObj.hours}h, ${timeObj.minutes}m`;
+        }
+
+        function formatRelativeTime(futureDate) {
+            const now = new Date();
+            const seconds = Math.round((futureDate - now) / 1000);
+
+            const minutes = Math.round(seconds / 60);
+            const hours = Math.round(seconds / 3600);
+            const days = Math.round(seconds / 86400);
+
+            if (seconds < 60) {
+                return `in a few seconds`;
+            } else if (minutes < 60) {
+                return `in ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+            } else if (hours < 24) {
+                return `in ${hours} hour${hours !== 1 ? 's' : ''}`;
+            } else {
+                return `in ${days} day${days !== 1 ? 's' : ''}`;
+            }
+        }
+        
+        function calculateTime() {
+            const target = parseFloat(document.getElementById("target").value);
+            const outputDiv = document.getElementById("time-output");
+            const lowReward = 0.10;
+            const highReward = 0.15;
+
+            outputDiv.innerHTML = '';
+            outputDiv.classList.remove('opacity-100');
+            outputDiv.classList.add('opacity-0');
+
+            if (isNaN(target) || target <= 0) {
+                outputDiv.innerHTML = `<p class="text-red-400">Please enter a valid target amount.</p>`;
+                outputDiv.classList.add('opacity-100');
+                lastCalculatedValue = null;
+                return;
+            }
+
+            const bestCase = timeToReach(target, highReward);
+            const worstCase = timeToReach(target, lowReward);
+            const now = new Date();
+            const bestCaseDate = new Date(now.getTime() + (bestCase.days * 86400000) + (bestCase.hours * 3600000) + (bestCase.minutes * 60000));
+            const worstCaseDate = new Date(now.getTime() + (worstCase.days * 86400000) + (worstCase.hours * 3600000) + (worstCase.minutes * 60000));
+            const bestCaseTimestamp = Math.floor(bestCaseDate.getTime() / 1000);
+            const worstCaseTimestamp = Math.floor(worstCaseDate.getTime() / 1000);
+            const bestCaseDiscord = `<t:${bestCaseTimestamp}:R>`;
+            const worstCaseDiscord = `<t:${worstCaseTimestamp}:R>`;
+            const bestCaseRelative = formatRelativeTime(bestCaseDate);
+            const worstCaseRelative = formatRelativeTime(worstCaseDate);
+            lastCalculatedValue = target;
+
+            let resultHTML = `
+                <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-lg space-y-5">
+                    <div class="text-center">
+                        <h3 class="font-medium text-lg text-gray-300 mb-2">Est. Time to Reach $${target.toFixed(2)}</h3>
+                        <p class="text-2xl font-semibold mt-2 text-white">${formatTime(bestCase)} - ${formatTime(worstCase)}</p>
+                        <p class="text-sm text-gray-400 mt-3">Plays Needed: <span class="font-semibold text-white">${bestCase.playsNeeded.toLocaleString()} - ${worstCase.playsNeeded.toLocaleString()}</span></p>
+                        <p class="text-xs text-gray-500 mt-4 italic">Based on a reward of $0.10 - $0.15 every 30 mins.</p>
+                    </div>
+                    <div class="border-t border-gray-700/50 pt-4">
+                         <h4 class="font-medium text-md text-gray-300 mb-3 text-center">Discord Timestamps</h4>
+                         <div class="space-y-3">
+                            <div class="bg-gray-800/50 p-2 rounded-lg flex justify-between items-center">
+                                <span class="text-white text-sm pl-2">${bestCaseRelative}</span>
+                                <button onclick="copyTimestamp('${bestCaseDiscord}', this)" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1.5 px-4 rounded-md transition-colors">Copy Best</button>
+                            </div>
+                            <div class="bg-gray-800/50 p-2 rounded-lg flex justify-between items-center">
+                                <span class="text-white text-sm pl-2">${worstCaseRelative}</span>
+                                <button onclick="copyTimestamp('${worstCaseDiscord}', this)" class="text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1.5 px-4 rounded-md transition-colors">Copy Worst</button>
+                            </div>
+                         </div>
+                    </div>
+                </div>`;
+            outputDiv.innerHTML = resultHTML;
+            setTimeout(() => { outputDiv.classList.add('opacity-100'); }, 100);
+        }
+
+        function calculateEarnings() {
+            const days = parseFloat(document.getElementById('days').value) || 0;
+            const hours = parseFloat(document.getElementById('hours').value) || 0;
+            const minutes = parseFloat(document.getElementById('minutes').value) || 0;
+            const outputDiv = document.getElementById('earnings-output');
+            outputDiv.innerHTML = '';
+            outputDiv.classList.remove('opacity-100');
+            outputDiv.classList.add('opacity-0');
+
+            if (days === 0 && hours === 0 && minutes === 0) {
+                outputDiv.innerHTML = `<p class="text-red-400">Please enter a valid duration.</p>`;
+                outputDiv.classList.add('opacity-100');
+                return;
+            }
+
+            const totalMinutes = (days * 24 * 60) + (hours * 60) + minutes;
+            const plays = Math.floor(totalMinutes / 30);
+            const lowEarnings = plays * 0.10;
+            const highEarnings = plays * 0.15;
+            
+            let resultHTML = `
+                <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-lg space-y-3 text-center">
+                    <h3 class="font-medium text-lg text-gray-300">Est. Earnings</h3>
+                    <p class="text-2xl font-semibold text-white">$${lowEarnings.toFixed(2)} - $${highEarnings.toFixed(2)}</p>
+                    <p class="text-sm text-gray-400">From <span class="font-semibold text-white">${plays.toLocaleString()}</span> plays</p>
+                </div>`;
+            outputDiv.innerHTML = resultHTML;
+            setTimeout(() => { outputDiv.classList.add('opacity-100'); }, 100);
+        }
+    </script>
+</body>
+</html>
